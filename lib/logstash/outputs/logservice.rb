@@ -74,7 +74,7 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
     @retry = 0
     begin
       @retry += 1
-      @logclient.PutLogs(@project, @logstore, @topic, loggroup, @source)
+      @logclient.PutLogs(@project, @logstore, @topic, loggroup, @source.to_s)
       @logger.info("send logs to logservice success", :logcount => loggroup.size().to_s)
     rescue LogException => e
       @error_code = e.GetErrorCode()
