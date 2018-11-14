@@ -38,7 +38,7 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
 
   # logGroup will retry send to log service when error happened, and will be discard when retry times exceed limit
   config :max_send_retry, :validate=> :number, :required=> true, :default=> 10 
-  # sleep default 100 milliseconds before retry next send
+  # sleep default 200 milliseconds before retry next send
   config :send_retry_interval, :validate=> :number, :required=> false, :default=> 200
 
   Log = com.aliyun.openservices.log
@@ -54,7 +54,7 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
     )
     @logclient = Log.Client::new(@endpoint, @access_key_id, @access_key_secret)
     if @source == ''
-      @source = Socket.ip_address_list.detect{|intf| intf.ipv4_private?}
+        @source = Socket.ip_address_list.detect{|intf| intf.ipv4_private?}.ip_address
     end
     @send_retry_interval_seconds = @send_retry_interval / 1000.0
     @logger.info("init logstash-output-logservice plugin", :endpoint => @endpoint, :project => @project, :logstore => @logstore, :topic => @topic, :source => @source, :max_buffer_bytes => @max_buffer_bytes)
@@ -80,19 +80,19 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
       @error_code = e.GetErrorCode()
       @error_message = e.GetErrorMessage()
       if @retry < @max_send_retry
-        @logger.warn("send logs to logservice fail, will retry soon", :exception => e, :error_code => @error_code, :error_message => @error_message, :retry => @retry)
+        @logger.warn("send logs to logservice fail, will retry later", :exception => e, :error_code => @error_code, :error_message => @error_message, :retry => @retry)
         sleep(@send_retry_interval_seconds)
         retry
       else
-        @logger.error("send logs to logservice fail, disarcd logs", :exception => e, :error_code => @error_code, :error_message => @error_message, :retry => @retry)
+        @logger.error("send logs to logservice fail, discard data", :exception => e, :error_code => @error_code, :error_message => @error_message, :retry => @retry)
       end
     rescue => e
       if @retry < @max_send_retry
-        @logger.warn("send logs to logservice fail, will retry soon", :exception => e, :retry => @retry)
+        @logger.warn("send logs to logservice fail, retry later", :exception => e, :retry => @retry)
         sleep(@send_retry_interval_seconds)
         retry
       else
-        @logger.error("send logs to logservice fail, disarcd logs", :exception => e, :retry => @retry)
+        @logger.error("send logs to logservice fail, discard data", :exception => e, :retry => @retry)
       end
     end
   end
@@ -127,7 +127,7 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
           @byte_size = 0
         end
       rescue => e
-        @logger.warn("decode log data to LogGroup fail", :exception => e)
+        @logger.warn("deserialize log data from json to LogGroup(protobuf) fail", :exception => e)
       end
     }
     if @byte_size > 0
