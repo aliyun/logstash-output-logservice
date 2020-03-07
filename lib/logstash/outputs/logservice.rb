@@ -5,6 +5,7 @@ require "logstash/environment"
 require "stud/buffer"
 require 'socket'
 require "java"
+require 'json'
 
 import "java.util.ArrayList"
 
@@ -116,7 +117,7 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
         @logitem.SetTime(Time.parse(@event_map['@timestamp'].to_s).to_i)
         @event_map.each do | key, value |
           @key_str = key.to_s
-          @value_str = value.to_s
+          @value_str = value.to_json
           @byte_size += @key_str.length + @value_str.length
           @logitem.PushBack(@key_str, @value_str)
         end
