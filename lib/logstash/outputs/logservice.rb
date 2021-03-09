@@ -42,6 +42,8 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
   # sleep default 200 milliseconds before retry next send
   config :send_retry_interval, :validate=> :number, :required=> false, :default=> 200
 
+  config :to_json, :validate=> :boolean, :required=> false, :default=> true
+
   Log = com.aliyun.openservices.log
   LogException = com.aliyun.openservices.log.exception.LogException
   LogCommon = com.aliyun.openservices.log.common
@@ -117,7 +119,11 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
         @logitem.SetTime(Time.parse(@event_map['@timestamp'].to_s).to_i)
         @event_map.each do | key, value |
           @key_str = key.to_s
-          @value_str = value.to_json
+          if @to_json
+            @value_str = value.to_json
+          else
+            @value_str = value.to_s
+          end
           @byte_size += @key_str.length + @value_str.length
           @logitem.PushBack(@key_str, @value_str)
         end
