@@ -43,6 +43,7 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
   config :send_retry_interval, :validate=> :number, :required=> false, :default=> 200
 
   config :to_json, :validate=> :boolean, :required=> false, :default=> true
+  config :time_key, :validate=> :string, :required=> false, :default=> "@timestamp"
 
   Log = com.aliyun.openservices.log
   LogException = com.aliyun.openservices.log.exception.LogException
@@ -116,7 +117,12 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
         end
         @logitem = LogCommon.LogItem.new
         #@timestamp like 2016-02-18T03:23:11.053Z
-        @logitem.SetTime(Time.parse(@event_map['@timestamp'].to_s).to_i)
+        time_value = @event_map[@time_key]
+        if time_value.nil? || time_value.empty?
+           time_value = @event_map['@timestamp']
+           @logger.warn("The time_key is nil or empty, use @timestamp")
+        end
+        @logitem.SetTime(Time.parse(time_value.to_s).to_i)
         @event_map.each do | key, value |
           @key_str = key.to_s
           if @to_json

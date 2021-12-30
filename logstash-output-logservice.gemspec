@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'logstash-output-logservice'
-  s.version = "0.8.0"
+  s.version = "0.9.0"
   s.licenses = ['Apache-2.0']
   s.summary = "post data into logservice."
   s.description = "This gem is a logstash plugin required to be installed on top of the Logstash core pipeline using $LS_HOME/bin/plugin install gemname. This gem is not a stand-alone program"
