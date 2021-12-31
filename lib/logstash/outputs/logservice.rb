@@ -118,9 +118,9 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
         @logitem = LogCommon.LogItem.new
         #@timestamp like 2016-02-18T03:23:11.053Z
         time_value = @event_map[@time_key]
-        if time_value.nil? || time_value.empty?
+        if time_value.nil?
            time_value = @event_map['@timestamp']
-           @logger.warn("The time_key is nil or empty, use @timestamp")
+           @logger.warn("The time_key is nil, use @timestamp")
         end
         @logitem.SetTime(Time.parse(time_value.to_s).to_i)
         @event_map.each do | key, value |
