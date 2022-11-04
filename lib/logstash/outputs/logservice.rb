@@ -125,6 +125,9 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
         @logitem.SetTime(Time.parse(time_value.to_s).to_i)
         @event_map.each do | key, value |
           @key_str = key.to_s
+          if @key_str == '__time__'
+            next
+          end
           if @to_json
             @value_str = value.to_json
           else
