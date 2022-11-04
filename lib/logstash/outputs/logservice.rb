@@ -57,9 +57,9 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
         :logger => @logger
     )
     @logclient = Log.Client::new(@endpoint, @access_key_id, @access_key_secret)
-    if @source == ''
-        @source = Socket.ip_address_list.detect{|intf| intf.ipv4_private?}.ip_address
-    end
+#     if @source == ''
+#         @source = Socket.ip_address_list.detect{|intf| intf.ipv4_private?}.ip_address
+#     end
     @send_retry_interval_seconds = @send_retry_interval / 1000.0
     @logger.info("init logstash-output-logservice plugin", :endpoint => @endpoint, :project => @project, :logstore => @logstore, :topic => @topic, :source => @source, :max_buffer_bytes => @max_buffer_bytes)
   end # def register
