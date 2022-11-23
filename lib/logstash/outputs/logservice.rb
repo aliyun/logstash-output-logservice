@@ -128,7 +128,7 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
           if @key_str == '__time__'
             next
           end
-          if @to_json
+          if value.instance_of? Hash
             @value_str = value.to_json
           else
             @value_str = value.to_s
