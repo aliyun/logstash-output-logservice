@@ -32,7 +32,7 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
   # default 2*1024*1024 Bytes in a logGroup for batch send
   config :max_buffer_bytes, :validate=> :number, :required=> false, :default=> 2097152
   # for batch send, logGroup will emit in default 3 seconds
-  config :max_buffer_seconds, :validate=> :number, :required=> false, :default=> 2
+  config :max_buffer_seconds, :validate=> :number, :required=> false, :default=> 3
   # the maximum log size that a single producer instance can cache is 100MB by default.
   config :total_size_in_bytes, :validate=> :number, :required=> false, :default=> 104857600
 
