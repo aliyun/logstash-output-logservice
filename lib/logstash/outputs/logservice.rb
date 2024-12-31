@@ -77,7 +77,10 @@ class LogStash::Outputs::LogService < LogStash::Outputs::Base
          time_value = @event_map['@timestamp']
          @logger.warn("The time_key is nil, use @timestamp")
       end
-      @logitem.SetTime(Time.parse(time_value.to_s).to_i)
+      time_s = Time.parse(time_value.to_s)
+      @logitem.SetTime(time_s.to_i)
+      time_ms_part=time_s.to_datetime().strftime('%L').to_i
+      @logitem.SetTimeNsPart(time_ms_part*1000000)
       @event_map.each do | key, value |
         @key_str = key.to_s
         if @key_str == '__time__'
